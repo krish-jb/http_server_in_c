@@ -1,0 +1,290 @@
+sys_socket.h(7POSIX)                                            POSIX Programmer's Manual                                           sys_socket.h(7POSIX)
+
+PPRROOLLOOGG
+       This  manual  page  is  part  of the POSIX Programmer's Manual.  The Linux implementation of this interface may differ (consult the corresponding
+       Linux manual page for details of Linux behavior), or the interface may not be implemented on Linux.
+
+NNAAMMEE
+       sys/socket.h — main sockets header
+
+SSYYNNOOPPSSIISS
+       #include <sys/socket.h>
+
+DDEESSCCRRIIPPTTIIOONN
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the ssoocckklleenn__tt type, which is an integer type of width of at least 32 bits; see APPLICATION USAGE.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the ssaa__ffaammiillyy__tt unsigned integer type.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the ssoocckkaaddddrr structure, which shall include at least the following members:
+
+           sa_family_t  sa_family  Address family.
+           char         sa_data[]  Socket address (variable-length data).
+
+       The ssoocckkaaddddrr structure is used to define a socket address which is used in the _b_i_n_d(), _c_o_n_n_e_c_t(), _g_e_t_p_e_e_r_n_a_m_e(), _g_e_t_s_o_c_k_n_a_m_e(),  _r_e_c_v_f_r_o_m(),  and
+       _s_e_n_d_t_o() functions.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the ssoocckkaaddddrr__ssttoorraaggee structure, which shall be:
+
+        *  Large enough to accommodate all supported protocol-specific address structures
+
+        *  Aligned  at an appropriate boundary so that pointers to it can be cast as pointers to protocol-specific address structures and used to access
+           the fields of those structures without alignment problems
+
+       The ssoocckkaaddddrr__ssttoorraaggee structure shall include at least the following members:
+
+           sa_family_t   ss_family
+
+       When a pointer to a ssoocckkaaddddrr__ssttoorraaggee structure is cast as a pointer to a ssoocckkaaddddrr structure, the _s_s___f_a_m_i_l_y field of the  ssoocckkaaddddrr__ssttoorraaggee  struc‐
+       ture  shall map onto the _s_a___f_a_m_i_l_y field of the ssoocckkaaddddrr structure. When a pointer to a ssoocckkaaddddrr__ssttoorraaggee structure is cast as a pointer to a pro‐
+       tocol-specific address structure, the _s_s___f_a_m_i_l_y field shall map onto a field of that structure that is of type ssaa__ffaammiillyy__tt  and  that  identifies
+       the protocol's address family.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the mmssgghhddrr structure, which shall include at least the following members:
+
+           void          *msg_name        Optional address.
+           socklen_t      msg_namelen     Size of address.
+           struct iovec  *msg_iov         Scatter/gather array.
+           int            msg_iovlen      Members in _m_s_g___i_o_v.
+           void          *msg_control     Ancillary data; see below.
+           socklen_t      msg_controllen  Ancillary data buffer _l_e_n.
+           int            msg_flags       Flags on received message.
+
+       The  mmssgghhddrr  structure is used to minimize the number of directly supplied parameters to the _r_e_c_v_m_s_g() and _s_e_n_d_m_s_g() functions. This structure is
+       used as a _v_a_l_u_e‐_r_e_s_u_l_t parameter in the _r_e_c_v_m_s_g() function and _v_a_l_u_e only for the _s_e_n_d_m_s_g() function.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the iioovveecc structure as described in _<_s_y_s_/_u_i_o_._h_>.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the ccmmssgghhddrr structure, which shall include at least the following members:
+
+           socklen_t  cmsg_len    Data byte count, including the ccmmssgghhddrr.
+           int        cmsg_level  Originating protocol.
+           int        cmsg_type   Protocol-specific type.
+
+       The ccmmssgghhddrr structure is used for storage of ancillary data object information.
+
+       Ancillary data consists of a sequence of pairs, each consisting of a ccmmssgghhddrr structure followed by a data array. The data array contains the  an‐
+       cillary data message, and the ccmmssgghhddrr structure contains descriptive information that allows an application to correctly parse the data.
+
+       The  values  for _c_m_s_g___l_e_v_e_l shall be legal values for the _l_e_v_e_l argument to the _g_e_t_s_o_c_k_o_p_t() and _s_e_t_s_o_c_k_o_p_t() functions. The system documentation
+       shall specify the _c_m_s_g___t_y_p_e definitions for the supported protocols.
+
+       Ancillary data is also possible at the socket level. The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the  following  symbolic  constant  for  use  as  the
+       _c_m_s_g___t_y_p_e value when _c_m_s_g___l_e_v_e_l is SOL_SOCKET:
+
+       SCM_RIGHTS    Indicates that the data array contains the access rights to be sent or received.
+
+       The  _<_s_y_s_/_s_o_c_k_e_t_._h_>  header  shall  define the following macros to gain access to the data arrays in the ancillary data associated with a message
+       header:
+
+       CMSG_DATA(_c_m_s_g)
+             If the argument is a pointer to a ccmmssgghhddrr structure, this macro shall return an unsigned character pointer to  the  data  array  associated
+             with the ccmmssgghhddrr structure.
+
+       CMSG_NXTHDR(_m_h_d_r_,_c_m_s_g)
+             If  the first argument is a pointer to a mmssgghhddrr structure and the second argument is a pointer to a ccmmssgghhddrr structure in the ancillary data
+             pointed to by the _m_s_g___c_o_n_t_r_o_l field of that mmssgghhddrr structure, this macro shall return a pointer to the next ccmmssgghhddrr structure,  or  a  null
+             pointer if this structure is the last ccmmssgghhddrr in the ancillary data.
+
+       CMSG_FIRSTHDR(_m_h_d_r)
+             If  the argument is a pointer to a mmssgghhddrr structure, this macro shall return a pointer to the first ccmmssgghhddrr structure in the ancillary data
+             associated with this mmssgghhddrr structure, or a null pointer if there is no ancillary data associated with the mmssgghhddrr structure.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the lliinnggeerr structure, which shall include at least the following members:
+
+           int  l_onoff   Indicates whether linger option is enabled.
+           int  l_linger  Linger time, in seconds.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constants with distinct values:
+
+       SOCK_DGRAM    Datagram socket.
+
+       SOCK_RAW      Raw Protocol Interface.
+
+       SOCK_SEQPACKET
+                     Sequenced-packet socket.
+
+       SOCK_STREAM   Byte-stream socket.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constant for use as the _l_e_v_e_l argument of _s_e_t_s_o_c_k_o_p_t() and _g_e_t_s_o_c_k_o_p_t().
+
+       SOL_SOCKET    Options to be accessed at socket level, not protocol level.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constants with distinct values for use as the _o_p_t_i_o_n___n_a_m_e argument in  _g_e_t_s_o_c_k_o_p_t()
+       or _s_e_t_s_o_c_k_o_p_t() calls (see the System Interfaces volume of POSIX.1‐2017, _S_e_c_t_i_o_n _2_._1_0_._1_6, _U_s_e _o_f _O_p_t_i_o_n_s):
+
+       SO_ACCEPTCONN Socket is accepting connections.
+
+       SO_BROADCAST  Transmission of broadcast messages is supported.
+
+       SO_DEBUG      Debugging information is being recorded.
+
+       SO_DONTROUTE  Bypass normal routing.
+
+       SO_ERROR      Socket error status.
+
+       SO_KEEPALIVE  Connections are kept alive with periodic messages.
+
+       SO_LINGER     Socket lingers on close.
+
+       SO_OOBINLINE  Out-of-band data is transmitted in line.
+
+       SO_RCVBUF     Receive buffer size.
+
+       SO_RCVLOWAT   Receive ``low water mark''.
+
+       SO_RCVTIMEO   Receive timeout.
+
+       SO_REUSEADDR  Reuse of local addresses is supported.
+
+       SO_SNDBUF     Send buffer size.
+
+       SO_SNDLOWAT   Send ``low water mark''.
+
+       SO_SNDTIMEO   Send timeout.
+
+       SO_TYPE       Socket type.
+
+       The  _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constant for use as the maximum _b_a_c_k_l_o_g queue length which may be specified by the
+       _b_a_c_k_l_o_g field of the _l_i_s_t_e_n() function:
+
+       SOMAXCONN     The maximum _b_a_c_k_l_o_g queue length.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constants with distinct values for use as the valid values for the _m_s_g___f_l_a_g_s  field
+       in the mmssgghhddrr structure, or the _f_l_a_g_s parameter in _r_e_c_v(), _r_e_c_v_f_r_o_m(), _r_e_c_v_m_s_g(), _s_e_n_d(), _s_e_n_d_m_s_g(), or _s_e_n_d_t_o() calls:
+
+       MSG_CTRUNC    Control data truncated.
+
+       MSG_DONTROUTE Send without using routing tables.
+
+       MSG_EOR       Terminates a record (if supported by the protocol).
+
+       MSG_OOB       Out-of-band data.
+
+       MSG_NOSIGNAL  No SIGPIPE generated when an attempt to send is made on a stream-oriented socket that is no longer connected.
+
+       MSG_PEEK      Leave received data in queue.
+
+       MSG_TRUNC     Normal data truncated.
+
+       MSG_WAITALL   Attempt to fill the read buffer.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constants with distinct values:
+
+       AF_INET       Internet domain sockets for use with IPv4 addresses.
+
+       AF_INET6      Internet domain sockets for use with IPv6 addresses.
+
+       AF_UNIX       UNIX domain sockets.
+
+       AF_UNSPEC     Unspecified.
+
+       The value of AF_UNSPEC shall be 0.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the following symbolic constants with distinct values:
+
+       SHUT_RD       Disables further receive operations.
+
+       SHUT_RDWR     Disables further send and receive operations.
+
+       SHUT_WR       Disables further send operations.
+
+       The _<_s_y_s_/_s_o_c_k_e_t_._h_> header shall define the ssiizzee__tt and ssssiizzee__tt types as described in _<_s_y_s_/_t_y_p_e_s_._h_>.
+
+       The following shall be declared as functions and may also be defined as macros. Function prototypes shall be provided.
+
+           int     accept(int, struct sockaddr *restrict, socklen_t *restrict);
+           int     bind(int, const struct sockaddr *, socklen_t);
+           int     connect(int, const struct sockaddr *, socklen_t);
+           int     getpeername(int, struct sockaddr *restrict, socklen_t *restrict);
+           int     getsockname(int, struct sockaddr *restrict, socklen_t *restrict);
+           int     getsockopt(int, int, int, void *restrict, socklen_t *restrict);
+           int     listen(int, int);
+           ssize_t recv(int, void *, size_t, int);
+           ssize_t recvfrom(int, void *restrict, size_t, int,
+                   struct sockaddr *restrict, socklen_t *restrict);
+           ssize_t recvmsg(int, struct msghdr *, int);
+           ssize_t send(int, const void *, size_t, int);
+           ssize_t sendmsg(int, const struct msghdr *, int);
+           ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *,
+                   socklen_t);
+           int     setsockopt(int, int, int, const void *, socklen_t);
+           int     shutdown(int, int);
+           int     sockatmark(int);
+           int     socket(int, int, int);
+           int     socketpair(int, int, int, int [2]);
+
+       Inclusion of _<_s_y_s_/_s_o_c_k_e_t_._h_> may also make visible all symbols from _<_s_y_s_/_u_i_o_._h_>.
+
+       _T_h_e _f_o_l_l_o_w_i_n_g _s_e_c_t_i_o_n_s _a_r_e _i_n_f_o_r_m_a_t_i_v_e_.
+
+AAPPPPLLIICCAATTIIOONN UUSSAAGGEE
+       To forestall portability problems, it is recommended that applications not use values larger than 231 -1 for the ssoocckklleenn__tt type.
+
+       The  ssoocckkaaddddrr__ssttoorraaggee structure solves the problem of declaring storage for automatic variables which is both large enough and aligned enough for
+       storing the socket address data structure of any family. For example, code with a file descriptor and without the context of the  address  family
+       can  pass a pointer to a variable of this type, where a pointer to a socket address structure is expected in calls such as _g_e_t_p_e_e_r_n_a_m_e(), and de‐
+       termine the address family by accessing the received content after the call.
+
+       The example below illustrates a data structure which aligns on a 64-bit boundary. An implementation-defined field ___s_s___a_l_i_g_n following ___s_s___p_a_d_1 is
+       used  to  force a 64-bit alignment which covers proper alignment good enough for needs of at least ssoocckkaaddddrr__iinn66 (IPv6) and ssoocckkaaddddrr__iinn (IPv4) ad‐
+       dress data structures. The size of padding field ___s_s___p_a_d_1 depends on the chosen alignment boundary. The size of padding field ___s_s___p_a_d_2 depends on
+       the value of overall size chosen for the total size of the structure. This size and alignment are represented in the above example by implementa‐
+       tion-defined (not required) constants _SS_MAXSIZE (chosen value 128) and _SS_ALIGNMENT (with chosen value  8).  Constants  _SS_PAD1SIZE  (derived
+       value  6)  and  _SS_PAD2SIZE (derived value 112) are also for illustration and not required. The implementation-defined definitions and structure
+       field names above start with an <underscore> to denote implementation private name space. Portable code is not expected to  access  or  reference
+       those fields or constants.
+
+           /*
+            *  Desired design of maximum size and alignment.
+            */
+           #define _SS_MAXSIZE 128
+               /* Implementation-defined maximum size. */
+           #define _SS_ALIGNSIZE (sizeof(int64_t))
+               /* Implementation-defined desired alignment. */
+
+           /*
+            *  Definitions used for sockaddr_storage structure paddings design.
+            */
+           #define _SS_PAD1SIZE (_SS_ALIGNSIZE - sizeof(sa_family_t))
+           #define _SS_PAD2SIZE (_SS_MAXSIZE - (sizeof(sa_family_t)+ \
+                                 _SS_PAD1SIZE + _SS_ALIGNSIZE))
+           struct sockaddr_storage {
+               sa_family_t  ss_family;  /* Address family. */
+           /*
+            *  Following fields are implementation-defined.
+            */
+               char _ss_pad1[_SS_PAD1SIZE];
+                   /* 6-byte pad; this is to make implementation-defined
+                      pad up to alignment field that follows explicit in
+                      the data structure. */
+               int64_t _ss_align;  /* Field to force desired structure
+                                      storage alignment. */
+               char _ss_pad2[_SS_PAD2SIZE];
+                   /* 112-byte pad to achieve desired size,
+                      _SS_MAXSIZE value minus size of ss_family
+                      __ss_pad1, __ss_align fields is 112. */
+           };
+
+RRAATTIIOONNAALLEE
+       None.
+
+FFUUTTUURREE DDIIRREECCTTIIOONNSS
+       None.
+
+SSEEEE AALLSSOO
+       <<ssyyss__ttyyppeess..hh>>, <<ssyyss__uuiioo..hh>>
+
+       The  System  Interfaces  volume  of  POSIX.1‐2017,  _a_c_c_e_p_t(),  _b_i_n_d(),  _c_o_n_n_e_c_t(),  _g_e_t_p_e_e_r_n_a_m_e(), _g_e_t_s_o_c_k_n_a_m_e(), _g_e_t_s_o_c_k_o_p_t(), _l_i_s_t_e_n(), _r_e_c_v(),
+       _r_e_c_v_f_r_o_m(), _r_e_c_v_m_s_g(), _s_e_n_d(), _s_e_n_d_m_s_g(), _s_e_n_d_t_o(), _s_e_t_s_o_c_k_o_p_t(), _s_h_u_t_d_o_w_n(), _s_o_c_k_a_t_m_a_r_k(), _s_o_c_k_e_t(), _s_o_c_k_e_t_p_a_i_r()
+
+CCOOPPYYRRIIGGHHTT
+       Portions of this text are reprinted and reproduced in electronic form from IEEE Std 1003.1-2017, Standard for Information Technology --  Portable
+       Operating  System  Interface (POSIX), The Open Group Base Specifications Issue 7, 2018 Edition, Copyright (C) 2018 by the Institute of Electrical
+       and Electronics Engineers, Inc and The Open Group.  In the event of any discrepancy between this version and the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group Standard is the referee document. The original Standard can be obtained online at http://www.open‐
+       group.org/unix/online.html .
+
+       Any typographical or formatting errors that appear in this page are most likely to have been introduced during the conversion of the source files
+       to man page format. To report such errors, see https://www.kernel.org/doc/man-pages/reporting_bugs.html .
+
+IEEE/The Open Group                                                       2017                                                      sys_socket.h(7POSIX)
